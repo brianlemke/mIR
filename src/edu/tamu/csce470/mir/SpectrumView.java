@@ -40,12 +40,15 @@ public class SpectrumView extends View
 		
 		baselinePaint = new Paint();
 		baselinePaint.setColor(Color.rgb(0, 0, 200));
+		baselinePaint.setStrokeWidth(4.0f);
 		
 		samplePaint = new Paint();
 		samplePaint.setColor(Color.rgb(200, 0, 0));
+		samplePaint.setStrokeWidth(4.0f);
 		
 		absorbancePaint = new Paint();
 		absorbancePaint.setColor(Color.rgb(0, 200, 0));
+		absorbancePaint.setStrokeWidth(4.0f);
 	}
 	
 	public void setSpectrum(Spectrum spectrum)
@@ -151,6 +154,13 @@ public class SpectrumView extends View
 			for (int i = 0; i < canvas.getWidth(); i++)
 			{
 				int spectrumIndex = (int) (i / canvasWToSpectrumW);
+				
+				assert(spectrumIndex <= baselineIntensities.size());
+				if (spectrumIndex >= baselineIntensities.size())
+				{
+					spectrumIndex = baselineIntensities.size() - 1;
+				}
+				
 				int intensity = baselineIntensities.get(spectrumIndex);
 				int height = canvas.getHeight() - (int) (intensity * canvasHToSpectrumH);
 				
@@ -165,7 +175,14 @@ public class SpectrumView extends View
 			
 			for (int i = 0; i < canvas.getWidth(); i++)
 			{
-				int spectrumIndex = (int) (i * canvasWToSpectrumW);
+				int spectrumIndex = (int) (i / canvasWToSpectrumW);
+				
+				assert(spectrumIndex <= sampleIntensities.size());
+				if (spectrumIndex >= sampleIntensities.size())
+				{
+					spectrumIndex = sampleIntensities.size() - 1;
+				}
+				
 				int intensity = sampleIntensities.get(spectrumIndex);
 				int height = canvas.getHeight() - (int) (intensity * canvasHToSpectrumH);
 				
@@ -180,7 +197,14 @@ public class SpectrumView extends View
 			
 			for (int i = 0; i < canvas.getWidth(); i++)
 			{
-				int spectrumIndex = (int) (i * canvasWToSpectrumW);
+				int spectrumIndex = (int) (i / canvasWToSpectrumW);
+				
+				assert(spectrumIndex <= absorbancies.size());
+				if (spectrumIndex >= absorbancies.size())
+				{
+					spectrumIndex = absorbancies.size() - 1;
+				}
+				
 				int intensity = absorbancies.get(spectrumIndex);
 				int height = canvas.getHeight() - (int) (intensity * canvasHToSpectrumH);
 				

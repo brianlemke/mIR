@@ -19,6 +19,8 @@ public class MainActivity extends Activity {
 
 	private static final int REQUEST_CODE_CAPTURE_BASELINE = 100;
 	private static final int REQUEST_CODE_CAPTURE_SAMPLE = 200;
+	private static final int REQUEST_CODE_SELECT_BASELINE = 300;
+	private static final int REQUEST_CODE_SELECT_SAMPLE = 400;
 	
 	private Uri capturedImageUri;
 	
@@ -89,6 +91,36 @@ public class MainActivity extends Activity {
 				startActivity(displayImageIntent);
 			}
 		}
+		else if (requestCode == REQUEST_CODE_SELECT_BASELINE)
+		{
+			if (resultCode == RESULT_OK)
+			{
+				assert(data != null);
+				Uri selectedImageUri = data.getData();
+				Log.d("MainActivity", "Baseline image successfully selected from " + selectedImageUri);
+				spectrum.assignBaselineSpectrum(selectedImageUri);
+				spectrum.setDisplayMode(DisplayMode.BASELINE_IMAGE);
+				
+				Intent displayImageIntent = new Intent(this, SpectrumDisplayActivity.class);
+				displayImageIntent.putExtra("spectrum", spectrum);
+				startActivity(displayImageIntent);
+			}
+		}
+		else if (requestCode == REQUEST_CODE_SELECT_SAMPLE)
+		{
+			if (resultCode == RESULT_OK)
+			{
+				assert(data != null);
+				Uri selectedImageUri = data.getData();
+				Log.d("MainActivity", "Sample image successfully selected from " + selectedImageUri);
+				spectrum.assignSampleSpectrum(selectedImageUri);
+				spectrum.setDisplayMode(DisplayMode.SAMPLE_IMAGE);
+				
+				Intent displayImageIntent = new Intent(this, SpectrumDisplayActivity.class);
+				displayImageIntent.putExtra("spectrum", spectrum);
+				startActivity(displayImageIntent);
+			}
+		}
 		else {
 			assert(false);
 		}
@@ -100,6 +132,14 @@ public class MainActivity extends Activity {
 	
 	public void onCaptureSample(View view) {
 		captureImage(DisplayMode.SAMPLE_IMAGE);
+	}
+	
+	public void onLoadFileBaseline(View view) {
+		selectImage(DisplayMode.BASELINE_IMAGE);
+	}
+	
+	public void onLoadFileSample(View view) {
+		selectImage(DisplayMode.SAMPLE_IMAGE);
 	}
 	
 	public void onDisplaySpectrum(View view) {
@@ -165,6 +205,25 @@ public class MainActivity extends Activity {
 			break;
 		case SAMPLE_IMAGE:
 			startActivityForResult(captureIntent, REQUEST_CODE_CAPTURE_SAMPLE);
+			break;
+		default:
+			assert(false);
+		}
+	}
+
+	private void selectImage(DisplayMode mode)
+	{
+		// We're going to offload image selection to the default chooser application
+		Intent selectIntent = new Intent(Intent.ACTION_GET_CONTENT);
+		selectIntent.setType("image/*");
+		
+		switch (mode)
+		{
+		case BASELINE_IMAGE:
+			startActivityForResult(selectIntent, REQUEST_CODE_SELECT_BASELINE);
+			break;
+		case SAMPLE_IMAGE:
+			startActivityForResult(selectIntent, REQUEST_CODE_SELECT_SAMPLE);
 			break;
 		default:
 			assert(false);

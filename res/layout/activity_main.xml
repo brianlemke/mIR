@@ -57,4 +57,24 @@
         android:onClick="onDisplaySpectrum"
         android:text="Display Spectrum Graphs" />
 
+    <Button
+        android:id="@+id/selectBaselineButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/captureSampleButton"
+        android:layout_alignRight="@+id/captureSampleButton"
+        android:layout_centerVertical="true"
+        android:onClick="onLoadFileBaseline"
+        android:text="Load Baseline from File" />
+
+    <Button
+        android:id="@+id/selectSampleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/selectBaselineButton"
+        android:layout_alignRight="@+id/selectBaselineButton"
+        android:layout_below="@+id/selectBaselineButton"
+        android:onClick="onLoadFileSample"
+        android:text="Load Sample from File" />
+
 </RelativeLayout>
