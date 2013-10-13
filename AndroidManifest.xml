@@ -9,7 +9,7 @@
         android:targetSdkVersion="18" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -18,7 +18,8 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="edu.tamu.csce470.mir.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,10 +29,19 @@
         <activity
             android:name="edu.tamu.csce470.mir.ImageDisplayActivity"
             android:label="@string/title_activity_image_display"
-            android:parentActivityName="edu.tamu.csce470.mir.MainActivity" >
+            android:parentActivityName="edu.tamu.csce470.mir.MainActivity"
+            android:screenOrientation="landscape" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.tamu.csce470.mir.MainActivity" />
+        </activity>
+        <activity
+            android:name="edu.tamu.csce470.mir.SpectrumDisplayActivity"
+            android:label="@string/title_activity_spectrum_display"
+            android:parentActivityName="edu.tamu.csce470.mir.ImageDisplayActivity" android:screenOrientation="landscape">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.tamu.csce470.mir.ImageDisplayActivity" />
         </activity>
     </application>
 

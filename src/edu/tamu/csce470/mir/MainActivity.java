@@ -3,6 +3,8 @@ package edu.tamu.csce470.mir;
 import java.io.File;
 import java.util.UUID;
 
+import edu.tamu.csce470.mir.Spectrum.DisplayMode;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -15,15 +17,32 @@ import android.view.View;
 
 public class MainActivity extends Activity {
 
-	private static final int REQUEST_CODE_CAPTURE_IMAGE = 100;
+	private static final int REQUEST_CODE_CAPTURE_BASELINE = 100;
+	private static final int REQUEST_CODE_CAPTURE_SAMPLE = 200;
 	
 	private Uri capturedImageUri;
+	
+	private Spectrum spectrum;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.d("MainActivity", "onCreate called");
 		setContentView(R.layout.activity_main);
+		
+		if (savedInstanceState != null && savedInstanceState.containsKey("captureImageUri"))
+		{
+			capturedImageUri = (Uri) savedInstanceState.getParcelable("captureImageUri");
+		}
+		
+		if (savedInstanceState != null && savedInstanceState.containsKey("spectrum"))
+		{
+			spectrum = (Spectrum) savedInstanceState.getSerializable("spectrum");
+		}
+		else
+		{
+			spectrum = new Spectrum();
+		}
 	}
 
 	@Override
@@ -39,55 +58,34 @@ public class MainActivity extends Activity {
 		Log.d("MainActivity", "onSaveInstanceState called");
 		
 		savedInstanceState.putParcelable("capturedImageUri", capturedImageUri);
-	}
-	
-	@Override
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-		Log.d("MainActivity", "onRestoreInstanceState called");
-		
-		capturedImageUri = (Uri) savedInstanceState.getParcelable("capturedImageUri");
-	}
-	
-	@Override
-	protected void onStart() {
-		super.onStart();
-		Log.d("MainActivity", "onStart called");
-	}
-	
-	@Override
-	protected void onResume() {
-		super.onResume();
-		Log.d("MainActivity", "onResume called");
-	}
-	
-	@Override
-	protected void onPause() {
-		super.onPause();
-		Log.d("MainActivity", "onPause called");
-	}
-	
-	@Override
-	protected void onStop() {
-		super.onStop();
-		Log.d("MainActivity", "onStop called");
-	}
-	
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		Log.d("MainActivity", "onDestroy called");
+		savedInstanceState.putParcelable("spectrum", spectrum);
 	}
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		Log.d("MainActivity", "onActivityResult called");
-		if (requestCode == REQUEST_CODE_CAPTURE_IMAGE) {
+		if (requestCode == REQUEST_CODE_CAPTURE_BASELINE) {
 			if (resultCode == RESULT_OK) {
 				// Launch image display view with the resulting picture
 				Log.d("MainActivity", "Image successfully captured from " + capturedImageUri.toString());
-				Intent displayImageIntent = new Intent(this, ImageDisplayActivity.class);
-				displayImageIntent.putExtra("imageUri", capturedImageUri);
+				spectrum.assignBaselineSpectrum(capturedImageUri);
+				spectrum.setDisplayMode(DisplayMode.BASELINE_IMAGE);
+				
+				Intent displayImageIntent = new Intent(this, SpectrumDisplayActivity.class);
+				displayImageIntent.putExtra("spectrum", spectrum);
+				startActivity(displayImageIntent);
+			}
+		}
+		else if (requestCode == REQUEST_CODE_CAPTURE_SAMPLE)
+		{
+			if (resultCode == RESULT_OK)
+			{
+				Log.d("MainActivity", "Sample image successfully captured from " + capturedImageUri.toString());
+				spectrum.assignSampleSpectrum(capturedImageUri);
+				spectrum.setDisplayMode(DisplayMode.SAMPLE_IMAGE);
+				
+				Intent displayImageIntent = new Intent(this, SpectrumDisplayActivity.class);
+				displayImageIntent.putExtra("spectrum", spectrum);
 				startActivity(displayImageIntent);
 			}
 		}
@@ -96,7 +94,39 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	public void onCaptureImage(View view) {
+	public void onCaptureBaseline(View view) {
+		captureImage(DisplayMode.BASELINE_IMAGE);
+	}
+	
+	public void onCaptureSample(View view) {
+		captureImage(DisplayMode.SAMPLE_IMAGE);
+	}
+	
+	public void onDisplaySpectrum(View view) {
+		if (view.getId() == R.id.displayBaselineButton)
+		{
+			this.spectrum.setDisplayMode(DisplayMode.BASELINE_IMAGE);
+		}
+		else if (view.getId() == R.id.displaySampleButton)
+		{
+			this.spectrum.setDisplayMode(DisplayMode.SAMPLE_IMAGE);
+		}
+		else if (view.getId() == R.id.displaySpectrumButton)
+		{
+			this.spectrum.setDisplayMode(DisplayMode.SPECTRUM_GRAPH);
+		}
+		else
+		{
+			assert(false);
+		}
+		
+		Intent displayImageIntent = new Intent(this, SpectrumDisplayActivity.class);
+		displayImageIntent.putExtra("spectrum", spectrum);
+		startActivity(displayImageIntent);
+	}
+	
+	private void captureImage(DisplayMode mode)
+	{
 		// We're going to offload image capture to the default camera application
 		Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		
@@ -127,6 +157,17 @@ public class MainActivity extends Activity {
 		
 		// Start the camera application to take our picture
 		captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, capturedImageUri);
-		startActivityForResult(captureIntent, REQUEST_CODE_CAPTURE_IMAGE);
+		
+		switch (mode)
+		{
+		case BASELINE_IMAGE:
+			startActivityForResult(captureIntent, REQUEST_CODE_CAPTURE_BASELINE);
+			break;
+		case SAMPLE_IMAGE:
+			startActivityForResult(captureIntent, REQUEST_CODE_CAPTURE_SAMPLE);
+			break;
+		default:
+			assert(false);
+		}
 	}
 }

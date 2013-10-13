@@ -6,5 +6,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_image_capture">Image Capture</string>
     <string name="title_activity_image_display">ImageDisplayActivity</string>
+    <string name="title_activity_spectrum_display">SpectrumDisplayActivity</string>
 
 </resources>

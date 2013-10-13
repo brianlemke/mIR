@@ -9,12 +9,52 @@
     tools:context=".MainActivity" >
 
     <Button
-        android:id="@+id/captureImageButton"
+        android:id="@+id/captureBaselineButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="148dp"
-        android:onClick="onCaptureImage"
-        android:text="Capture Image" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:onClick="onCaptureBaseline"
+        android:text="Capture Baseline Image" />
+
+    <Button
+        android:id="@+id/captureSampleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/captureBaselineButton"
+        android:layout_alignRight="@+id/captureBaselineButton"
+        android:layout_below="@+id/captureBaselineButton"
+        android:onClick="onCaptureSample"
+        android:text="Capture Sample Image" />
+
+    <Button
+        android:id="@+id/displaySampleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/displayBaselineButton"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/displayBaselineButton"
+        android:onClick="onDisplaySpectrum"
+        android:text="Display Sample Image" />
+
+    <Button
+        android:id="@+id/displayBaselineButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/captureBaselineButton"
+        android:layout_alignBottom="@+id/captureBaselineButton"
+        android:layout_alignParentRight="true"
+        android:onClick="onDisplaySpectrum"
+        android:text="Display Baseline Image" />
+
+    <Button
+        android:id="@+id/displaySpectrumButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/displaySampleButton"
+        android:layout_alignRight="@+id/displaySampleButton"
+        android:layout_below="@+id/displaySampleButton"
+        android:onClick="onDisplaySpectrum"
+        android:text="Display Spectrum Graphs" />
 
 </RelativeLayout>
