@@ -130,6 +130,7 @@ public class Spectrum implements Parcelable
 			Bitmap baselineImage = BitmapFactory.decodeFile(imageUri.getPath(), bitmapOptions);
 			baselineIntensities = getIntensities(baselineImage);
 			baselineImageUri = imageUri;
+			baselineImage.recycle();
 			success = true;
 		}
 		catch (Exception e)
@@ -150,6 +151,7 @@ public class Spectrum implements Parcelable
 			Bitmap sampleImage = BitmapFactory.decodeFile(imageUri.getPath(), bitmapOptions);
 			sampleIntensities = getIntensities(sampleImage);
 			sampleImageUri = imageUri;
+			sampleImage.recycle();
 			success = true;
 		}
 		catch (Exception e)
