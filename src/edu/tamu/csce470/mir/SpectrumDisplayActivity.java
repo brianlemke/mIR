@@ -19,6 +19,16 @@ public class SpectrumDisplayActivity extends Activity {
 		
 		spectrumView.setSpectrum((Spectrum) getIntent().getExtras().getParcelable("spectrum"));
 	}
+	
+	@Override
+	protected void onDestroy()
+	{
+		super.onDestroy();
+		
+		SpectrumView spectrumView = (SpectrumView) findViewById(R.id.spectrumView);
+		
+		spectrumView.releaseSpectrum();
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

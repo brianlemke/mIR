@@ -92,6 +92,21 @@ public class SpectrumView extends View
 		}
 	}
 	
+	public void releaseSpectrum()
+	{
+		if (baselineImage != null)
+		{
+			baselineImage.recycle();
+		}
+		
+		if (sampleImage != null)
+		{
+			sampleImage.recycle();
+		}
+		
+		spectrum = null;
+	}
+	
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh)
 	{
