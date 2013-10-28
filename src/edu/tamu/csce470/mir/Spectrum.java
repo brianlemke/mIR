@@ -128,7 +128,7 @@ public class Spectrum implements Parcelable
 		{
 			BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
 			Bitmap baselineImage = BitmapFactory.decodeFile(imageUri.getPath(), bitmapOptions);
-			baselineIntensities = getIntensities(baselineImage);
+			baselineIntensities = getIntensities(baselineImage, true);
 			baselineImageUri = imageUri;
 			baselineImage.recycle();
 			success = true;
@@ -149,7 +149,7 @@ public class Spectrum implements Parcelable
 		{
 			BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
 			Bitmap sampleImage = BitmapFactory.decodeFile(imageUri.getPath(), bitmapOptions);
-			sampleIntensities = getIntensities(sampleImage);
+			sampleIntensities = getIntensities(sampleImage, true);
 			sampleImageUri = imageUri;
 			sampleImage.recycle();
 			success = true;
@@ -223,15 +223,31 @@ public class Spectrum implements Parcelable
 			{
 				int sampleI = sampleIntensities.get(i);
 				int baselineI = baselineIntensities.get(i);
-				float absorbance = 255 - 255 * sampleI / (baselineI + 1.0f);
+				float absorbance;
+				
+				if (sampleI >= baselineI - 3)
+				{
+					absorbance = 0.0f;
+				}
+				else
+				{
+					absorbance = 255.0f - 255.0f * (float) sampleI / ((float) baselineI + 1.0f);
+				}
+				
 				absorbancies.add(Math.round(absorbance));
 			}
 			
-			return absorbancies;
+			ArrayList<Double> proportions = new ArrayList<Double>();
+			proportions.add(0.2);
+			proportions.add(0.1);
+			proportions.add(0.1);
+			proportions.add(0.1);
+			proportions.add(0.1);
+			return getSmoothedValues(absorbancies, proportions);
 		}
 	}
 	
-	private ArrayList<Integer> getIntensities(Bitmap spectrum)
+	private ArrayList<Integer> getIntensities(Bitmap spectrum, boolean smoothed)
 	{
 		assert(sampleRow >= 0 && sampleRow <= 1.0);
 		
@@ -250,6 +266,55 @@ public class Spectrum implements Parcelable
 			intensities.add(Math.round(intensity));
 		}
 		
-		return intensities;
+		if (smoothed)
+		{
+			ArrayList<Double> proportions = new ArrayList<Double>();
+			proportions.add(0.2);
+			proportions.add(0.1);
+			proportions.add(0.1);
+			proportions.add(0.1);
+			proportions.add(0.1);
+			return getSmoothedValues(intensities, proportions);
+		}
+		else
+		{
+			return intensities;
+		}
+	}
+	
+	private ArrayList<Integer> getSmoothedValues(ArrayList<Integer> values, ArrayList<Double> proportions)
+	{
+		assert(values != null);
+		assert(proportions != null);
+		assert(proportions.size() > 0);
+		
+		// The proportions must total to 1 (the first index is the center, all the others are doubled)
+		double totalProportion = proportions.get(0);
+		for (int i = 1; i < proportions.size(); i++)
+		{
+			totalProportion += 2 * proportions.get(i);
+		}
+		assert(totalProportion == 1.0);
+		
+		ArrayList<Integer> smoothedValues = new ArrayList<Integer>(values.size());
+		
+		// For each pixel, smooth it to a weighted average of neighboring pixels
+		for (int i = 0; i < values.size(); i++)
+		{
+			double smoothedValue = proportions.get(0) * values.get(i);
+			
+			for (int j = 1; j < proportions.size(); j++)
+			{
+				int leftPixel = Math.max(0, i - j);
+				int rightPixel = Math.min(values.size() - 1, i + j);
+				
+				smoothedValue += proportions.get(j) * values.get(leftPixel);
+				smoothedValue += proportions.get(j) * values.get(rightPixel);
+			}
+			
+			smoothedValues.add((int) Math.round(smoothedValue));
+		}
+		
+		return smoothedValues;
 	}
 }
