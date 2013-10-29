@@ -248,16 +248,13 @@ public class Spectrum implements Parcelable
 	
 	private ArrayList<Integer> getIntensities(Bitmap spectrum, boolean smoothed)
 	{
-		assert(sampleRow >= 0 && sampleRow <= 1.0);
-		
-		int sampleRowIndex = (int) ((spectrum.getHeight() - 1) * sampleRow);
-		assert(sampleRowIndex >= 0 && sampleRowIndex < spectrum.getHeight());
+		assert(sampleRow >= 0 && sampleRow < spectrum.getHeight());
 		
 		ArrayList<Integer> intensities = new ArrayList<Integer>(spectrum.getHeight());
 		
 		for (int i = 0; i < spectrum.getWidth(); i++)
 		{
-			int color = spectrum.getPixel(i, sampleRowIndex);
+			int color = spectrum.getPixel(i, sampleRow);
 			assert(Color.alpha(color) == 255);
 			
 			float intensity = (Color.red(color) + Color.green(color) + Color.blue(color)) / 3.0f;

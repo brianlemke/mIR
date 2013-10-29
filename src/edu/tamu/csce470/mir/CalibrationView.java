@@ -79,7 +79,7 @@ public class CalibrationView extends View
 		}
 	}
 	
-	private int getImageWidth()
+	public int getImageWidth()
 	{
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inJustDecodeBounds = true;
@@ -88,7 +88,7 @@ public class CalibrationView extends View
 		return options.outWidth;
 	}
 	
-	private int getImageHeight()
+	public int getImageHeight()
 	{
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inJustDecodeBounds = true;

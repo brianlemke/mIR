@@ -21,7 +21,7 @@ public class SpectrumResult implements Serializable
 		assert(fullAbsorbancies != null && fullAbsorbancies.size() > 0);
 		assert(settings.endPixel < fullAbsorbancies.size());
 		
-		double deltaWavelength = (settings.wavelength2 - settings.wavelength1) / (settings.pixel2 - settings.pixel2);
+		double deltaWavelength = (settings.wavelength2 - settings.wavelength1) / (settings.pixel2 - settings.pixel1);
 		assert(deltaWavelength > 0.0);
 		
 		int distanceStartTo1 = settings.pixel1 - settings.startPixel;

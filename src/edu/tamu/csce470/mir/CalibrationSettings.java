@@ -6,6 +6,10 @@ public class CalibrationSettings implements Serializable
 {
 	private static final long serialVersionUID = 1579508071368959481L;
 	
+	// Image resolution information
+	public int imageWidth;
+	public int imageHeight;
+	
 	// Image location calibration
 	public int startPixel;
 	public int endPixel;
@@ -19,6 +23,9 @@ public class CalibrationSettings implements Serializable
 	
 	public CalibrationSettings()
 	{
+		imageWidth = -1;
+		imageHeight = -1;
+		
 		startPixel = -1;
 		endPixel = -1;
 		sampleRow = -1;
@@ -33,6 +40,8 @@ public class CalibrationSettings implements Serializable
 	{
 		boolean valid = true;
 		
+		if (imageWidth <= 0) valid = false;
+		if (imageHeight <= 0) valid = false;
 		if (startPixel < 0 || startPixel >= endPixel) valid = false;
 		if (endPixel < 0 || endPixel <= startPixel) valid = false;
 		if (sampleRow < 0) valid = false;

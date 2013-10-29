@@ -2,6 +2,8 @@ package edu.tamu.csce470.mir;
 
 import java.util.ArrayList;
 
+import edu.tamu.csce470.mir.Spectrum.DisplayMode;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,6 +18,7 @@ import android.view.View;
 public class SpectrumView extends View
 {
 	Spectrum spectrum;
+	CalibrationSettings calibration;
 	
 	Bitmap baselineImage;
 	Bitmap sampleImage;
@@ -24,12 +27,15 @@ public class SpectrumView extends View
 	Paint baselinePaint;
 	Paint samplePaint;
 	Paint absorbancePaint;
+	Paint sampleRowPaint;
+	Paint boundaryPaint;
 	
 	public SpectrumView(Context context, AttributeSet attributes)
 	{
 		super(context, attributes);
 		
 		spectrum = null;
+		calibration = null;
 		
 		baselineImage = null;
 		sampleImage = null;
@@ -49,6 +55,12 @@ public class SpectrumView extends View
 		absorbancePaint = new Paint();
 		absorbancePaint.setColor(Color.rgb(0, 200, 0));
 		absorbancePaint.setStrokeWidth(4.0f);
+		
+		sampleRowPaint = new Paint();
+		sampleRowPaint.setColor(Color.RED);
+		
+		boundaryPaint = new Paint();
+		boundaryPaint.setColor(Color.CYAN);
 	}
 	
 	public void setSpectrum(Spectrum spectrum)
@@ -107,6 +119,11 @@ public class SpectrumView extends View
 		spectrum = null;
 	}
 	
+	public void setCalibration(CalibrationSettings calibration)
+	{
+		this.calibration = calibration;
+	}
+	
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh)
 	{
@@ -133,6 +150,8 @@ public class SpectrumView extends View
 				break;		
 			}
 		}
+		
+		drawCalibrationLines(canvas);
 	}
 	
 	private void drawBaselineBitmap(Canvas canvas)
@@ -226,5 +245,22 @@ public class SpectrumView extends View
 				canvas.drawPoint(i, height, absorbancePaint);
 			}
 		}
+	}
+	
+	private void drawCalibrationLines(Canvas canvas)
+	{
+		assert(calibration != null);
+		
+		int sampleRowY = Math.round(((float) calibration.sampleRow / (float) calibration.imageHeight) * canvas.getHeight());
+		int leftBoundaryX = Math.round(((float) calibration.startPixel / (float) calibration.imageWidth) * canvas.getWidth());
+		int rightBoundaryX = Math.round(((float) calibration.endPixel / (float) calibration.imageWidth) * canvas.getWidth());
+		
+		if (spectrum.getDisplayMode() != DisplayMode.SPECTRUM_GRAPH)
+		{
+			canvas.drawLine(0, sampleRowY, canvas.getWidth(), sampleRowY, sampleRowPaint);
+		}
+		
+		canvas.drawLine(leftBoundaryX, 0, leftBoundaryX, canvas.getHeight(), boundaryPaint);
+		canvas.drawLine(rightBoundaryX, 0, rightBoundaryX, canvas.getHeight(), boundaryPaint);
 	}
 }

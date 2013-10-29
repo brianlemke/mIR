@@ -27,6 +27,8 @@ public class CalibrationActivity extends Activity
 		calView.setImage((Uri) getIntent().getExtras().getParcelable("image"));
 		
 		settings = new CalibrationSettings();
+		settings.imageWidth = calView.getImageWidth();
+		settings.imageHeight = calView.getImageHeight();
 		
 		hideTextField();
 		setInstructions("Choose sample line");

@@ -83,6 +83,7 @@ public class MainActivity extends Activity {
 				
 				Intent displayImageIntent = new Intent(this, SpectrumDisplayActivity.class);
 				displayImageIntent.putExtra("spectrum", spectrum);
+				displayImageIntent.putExtra("calibrationSettings", calibration);
 				startActivity(displayImageIntent);
 			}
 		}
@@ -96,6 +97,7 @@ public class MainActivity extends Activity {
 				
 				Intent displayImageIntent = new Intent(this, SpectrumDisplayActivity.class);
 				displayImageIntent.putExtra("spectrum", spectrum);
+				displayImageIntent.putExtra("calibrationSettings", calibration);
 				startActivity(displayImageIntent);
 			}
 		}
@@ -111,6 +113,7 @@ public class MainActivity extends Activity {
 				
 				Intent displayImageIntent = new Intent(this, SpectrumDisplayActivity.class);
 				displayImageIntent.putExtra("spectrum", spectrum);
+				displayImageIntent.putExtra("calibrationSettings", calibration);
 				startActivity(displayImageIntent);
 			}
 		}
@@ -126,6 +129,7 @@ public class MainActivity extends Activity {
 				
 				Intent displayImageIntent = new Intent(this, SpectrumDisplayActivity.class);
 				displayImageIntent.putExtra("spectrum", spectrum);
+				displayImageIntent.putExtra("calibrationSettings", calibration);
 				startActivity(displayImageIntent);
 			}
 		}
@@ -186,6 +190,8 @@ public class MainActivity extends Activity {
 			findViewById(R.id.displayBaselineButton).setEnabled(true);
 			findViewById(R.id.displaySampleButton).setEnabled(true);
 			findViewById(R.id.displaySpectrumButton).setEnabled(true);
+			
+			spectrum.setSampleRow(calibration.sampleRow);
 		}
 	}
 
@@ -225,6 +231,7 @@ public class MainActivity extends Activity {
 		
 		Intent displayImageIntent = new Intent(this, SpectrumDisplayActivity.class);
 		displayImageIntent.putExtra("spectrum", spectrum);
+		displayImageIntent.putExtra("calibrationSettings", calibration);
 		startActivity(displayImageIntent);
 	}
 	

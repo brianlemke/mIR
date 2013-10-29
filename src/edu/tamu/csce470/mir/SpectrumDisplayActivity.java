@@ -14,6 +14,7 @@ public class SpectrumDisplayActivity extends Activity {
 		SpectrumView spectrumView = (SpectrumView) findViewById(R.id.spectrumView);
 		
 		spectrumView.setSpectrum((Spectrum) getIntent().getExtras().getParcelable("spectrum"));
+		spectrumView.setCalibration((CalibrationSettings) getIntent().getExtras().getSerializable("calibrationSettings"));
 	}
 	
 	@Override
