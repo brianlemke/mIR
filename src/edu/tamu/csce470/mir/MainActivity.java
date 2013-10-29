@@ -1,9 +1,9 @@
 package edu.tamu.csce470.mir;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.util.UUID;
-
-import edu.tamu.csce470.mir.Spectrum.DisplayMode;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,6 +14,8 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Toast;
+import edu.tamu.csce470.mir.Spectrum.DisplayMode;
 
 public class MainActivity extends Activity {
 
@@ -21,10 +23,14 @@ public class MainActivity extends Activity {
 	private static final int REQUEST_CODE_CAPTURE_SAMPLE = 200;
 	private static final int REQUEST_CODE_SELECT_BASELINE = 300;
 	private static final int REQUEST_CODE_SELECT_SAMPLE = 400;
+	private static final int REQUEST_CODE_CAPTURE_CALIBRATION = 500;
+	private static final int REQUEST_CODE_SET_CALIBRATION = 600;
 	
 	private Uri capturedImageUri;
 	
 	private Spectrum spectrum;
+	
+	private CalibrationSettings calibration;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +51,8 @@ public class MainActivity extends Activity {
 		{
 			spectrum = new Spectrum();
 		}
+		
+		loadCalibrationSettings();
 	}
 
 	@Override
@@ -121,8 +129,63 @@ public class MainActivity extends Activity {
 				startActivity(displayImageIntent);
 			}
 		}
+		else if (requestCode == REQUEST_CODE_CAPTURE_CALIBRATION)
+		{
+			if (resultCode == RESULT_OK)
+			{
+				Log.d("MainActivity", "Calibration image successfully captured from " + capturedImageUri.toString());
+				
+				Intent calibrationIntent = new Intent(this, CalibrationActivity.class);
+				calibrationIntent.putExtra("image", capturedImageUri);
+				startActivityForResult(calibrationIntent, REQUEST_CODE_SET_CALIBRATION);
+			}
+		}
+		else if (requestCode == REQUEST_CODE_SET_CALIBRATION)
+		{
+			loadCalibrationSettings();
+		}
 		else {
 			assert(false);
+		}
+	}
+	
+	private void loadCalibrationSettings()
+	{	
+		calibration = null;
+		
+		try
+		{
+			FileInputStream file = getApplicationContext().openFileInput("calibration.bin");
+			ObjectInputStream objectStream = new ObjectInputStream(file);
+			calibration = (CalibrationSettings) objectStream.readObject();
+			objectStream.close();
+			file.close();
+		}
+		catch (Exception e)
+		{
+			Toast.makeText(this, "Failed to load the calibration settings.", Toast.LENGTH_LONG).show();
+			Log.e("CalibrationActivity", "Failed to load calibration settings: " + e);
+		}
+		
+		if (calibration == null)
+		{
+			findViewById(R.id.captureBaselineButton).setEnabled(false);
+			findViewById(R.id.captureSampleButton).setEnabled(false);
+			findViewById(R.id.selectBaselineButton).setEnabled(false);
+			findViewById(R.id.selectSampleButton).setEnabled(false);
+			findViewById(R.id.displayBaselineButton).setEnabled(false);
+			findViewById(R.id.displaySampleButton).setEnabled(false);
+			findViewById(R.id.displaySpectrumButton).setEnabled(false);
+		}
+		else
+		{
+			findViewById(R.id.captureBaselineButton).setEnabled(true);
+			findViewById(R.id.captureSampleButton).setEnabled(true);
+			findViewById(R.id.selectBaselineButton).setEnabled(true);
+			findViewById(R.id.selectSampleButton).setEnabled(true);
+			findViewById(R.id.displayBaselineButton).setEnabled(true);
+			findViewById(R.id.displaySampleButton).setEnabled(true);
+			findViewById(R.id.displaySpectrumButton).setEnabled(true);
 		}
 	}
 
@@ -165,35 +228,37 @@ public class MainActivity extends Activity {
 		startActivity(displayImageIntent);
 	}
 	
+	public void onCalibrate(View view)
+	{
+		Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		getNewImageUri();
+		captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, capturedImageUri);
+		
+		startActivityForResult(captureIntent, REQUEST_CODE_CAPTURE_CALIBRATION);
+	}
+	
+	public void onAccept(View view)
+	{
+		if (spectrum.getAbsorbancies() == null)
+		{
+			Toast.makeText(this, "Please capture a sample and baseline image first", Toast.LENGTH_LONG).show();
+		}
+		else
+		{
+			SpectrumResult result = new SpectrumResult(spectrum, calibration);
+			Intent intent = new Intent();
+			intent.putExtra("spectrumResult", result);
+			setResult(RESULT_OK, intent);
+			finish();
+		}
+	}
+	
 	private void captureImage(DisplayMode mode)
 	{
 		// We're going to offload image capture to the default camera application
 		Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		
-		// We're going to save it in the application's private images directory
-		File mediaStorageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-		if (mediaStorageDir == null) {
-			Log.e("MainActivity", "Could not access the external media folder, falling back to internal");
-			if (getFilesDir() == null) {
-				Log.e("MainActivity", "Could not access the internal media folder, no fallback available");
-				return;
-			}
-			else {
-				mediaStorageDir = new File(getFilesDir(), "Pictures");
-			}
-		}
-		
-		// Ensure that the pictures directory exists
-		if (!mediaStorageDir.exists()) {
-			if (!mediaStorageDir.mkdirs()) {
-				Log.e("MainActivity", "Could not create image output directory");
-				return;
-			}
-		}
-		
-		// By now, the directory definitely exists, so create a unique file name
-		File capturedImageFile = new File(mediaStorageDir, UUID.randomUUID().toString() + ".jpg");
-		capturedImageUri = Uri.fromFile(capturedImageFile);
+		getNewImageUri();
 		
 		// Start the camera application to take our picture
 		captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, capturedImageUri);
@@ -209,6 +274,34 @@ public class MainActivity extends Activity {
 		default:
 			assert(false);
 		}
+	}
+	
+	private void getNewImageUri()
+	{
+		// We're going to save it in the application's private images directory
+			File mediaStorageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+			if (mediaStorageDir == null) {
+				Log.e("MainActivity", "Could not access the external media folder, falling back to internal");
+				if (getFilesDir() == null) {
+					Log.e("MainActivity", "Could not access the internal media folder, no fallback available");
+					return;
+				}
+				else {
+					mediaStorageDir = new File(getFilesDir(), "Pictures");
+				}
+			}
+			
+			// Ensure that the pictures directory exists
+			if (!mediaStorageDir.exists()) {
+				if (!mediaStorageDir.mkdirs()) {
+					Log.e("MainActivity", "Could not create image output directory");
+					return;
+				}
+			}
+			
+			// By now, the directory definitely exists, so create a unique file name
+			File capturedImageFile = new File(mediaStorageDir, UUID.randomUUID().toString() + ".jpg");
+			capturedImageUri = Uri.fromFile(capturedImageFile);
 	}
 
 	private void selectImage(DisplayMode mode)

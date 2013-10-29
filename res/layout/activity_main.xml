@@ -61,9 +61,8 @@
         android:id="@+id/selectBaselineButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/captureSampleButton"
         android:layout_alignRight="@+id/captureSampleButton"
-        android:layout_centerVertical="true"
+        android:layout_alignTop="@+id/displaySpectrumButton"
         android:onClick="onLoadFileBaseline"
         android:text="Load Baseline from File" />
 
@@ -76,5 +75,25 @@
         android:layout_below="@+id/selectBaselineButton"
         android:onClick="onLoadFileSample"
         android:text="Load Sample from File" />
+
+    <Button
+        android:id="@+id/calibrateButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/captureSampleButton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/selectSampleButton"
+        android:onClick="onCalibrate"
+        android:text="Calibrate" />
+
+    <Button
+        android:id="@+id/acceptButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/displaySpectrumButton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:onClick="onAccept"
+        android:text="Accept Spectrum" />
 
 </RelativeLayout>

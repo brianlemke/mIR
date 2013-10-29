@@ -1,0 +1,53 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="bottom"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".CalibrationActivity" >
+
+    <Button
+        android:id="@+id/calibrationOK"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:onClick="onOKClicked"
+        android:text="OK" />
+
+    <EditText
+        android:id="@+id/calibrationEntry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/calibrationOK"
+        android:layout_alignBottom="@+id/calibrationOK"
+        android:layout_toLeftOf="@+id/calibrationOK"
+        android:ems="10"
+        android:inputType="numberDecimal" >
+
+        <requestFocus />
+    </EditText>
+
+    <edu.tamu.csce470.mir.CalibrationView
+        android:id="@+id/calibrationView1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/calibrationOK"
+        android:layout_alignRight="@+id/calibrationOK" />
+
+    <TextView
+        android:id="@+id/calibrationInstructions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/calibrationEntry"
+        android:layout_alignBottom="@+id/calibrationEntry"
+        android:layout_alignLeft="@+id/calibrationView1"
+        android:layout_toLeftOf="@+id/calibrationEntry"
+        android:text="TextView" />
+
+</RelativeLayout>

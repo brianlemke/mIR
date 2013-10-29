@@ -17,7 +17,7 @@ public class Spectrum implements Parcelable
 	// to the Parcelable functions as well.
 	private ArrayList<Integer> baselineIntensities;
 	private ArrayList<Integer> sampleIntensities;
-	float sampleRow;
+	int sampleRow;
 	
 	Uri baselineImageUri;
 	Uri sampleImageUri;
@@ -30,8 +30,7 @@ public class Spectrum implements Parcelable
 	{
 		baselineIntensities = null;
 		sampleIntensities = null;
-		
-		sampleRow = 0.5f;
+		sampleRow = 0;
 		
 		baselineImageUri = null;
 		sampleImageUri = null;
@@ -59,7 +58,7 @@ public class Spectrum implements Parcelable
 				spectrum.sampleIntensities = (ArrayList<Integer>) bundle.getSerializable("sampleIntensities");
 			}
 			
-			spectrum.sampleRow = bundle.getFloat("sampleRow");
+			spectrum.sampleRow = bundle.getInt("sampleRow");
 			
 			if (bundle.containsKey("baselineImageUri"))
 			{
@@ -97,7 +96,7 @@ public class Spectrum implements Parcelable
 			bundle.putSerializable("sampleIntensities", sampleIntensities);
 		}
 		
-		bundle.putFloat("sampleRow", sampleRow);
+		bundle.putInt("sampleRow", sampleRow);
 		
 		if (baselineImageUri != null)
 		{
@@ -162,7 +161,7 @@ public class Spectrum implements Parcelable
 		return success;
 	}
 	
-	public void setSampleRow(float row)
+	public void setSampleRow(int row)
 	{
 		sampleRow = row;
 		

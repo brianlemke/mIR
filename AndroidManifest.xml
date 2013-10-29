@@ -38,10 +38,19 @@
         <activity
             android:name="edu.tamu.csce470.mir.SpectrumDisplayActivity"
             android:label="@string/title_activity_spectrum_display"
-            android:parentActivityName="edu.tamu.csce470.mir.ImageDisplayActivity" android:screenOrientation="landscape">
+            android:parentActivityName="edu.tamu.csce470.mir.ImageDisplayActivity"
+            android:screenOrientation="landscape" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.tamu.csce470.mir.ImageDisplayActivity" />
+        </activity>
+        <activity
+            android:name="edu.tamu.csce470.mir.CalibrationActivity"
+            android:label="@string/title_activity_calibration"
+            android:parentActivityName="edu.tamu.csce470.mir.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.tamu.csce470.mir.MainActivity" />
         </activity>
     </application>
 
