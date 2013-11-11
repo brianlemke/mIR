@@ -1,0 +1,48 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".ClassifierActivity" >
+
+    <Button
+        android:id="@+id/analyzeSample"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:onClick="onAnalyzeSample"
+        android:text="Analyze Sample" />
+
+    <Button
+        android:id="@+id/addKnownSample"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/analyzeSample"
+        android:layout_alignRight="@+id/analyzeSample"
+        android:layout_below="@+id/analyzeSample"
+        android:onClick="onAddKnownSample"
+        android:text="Add Known Sample" />
+
+    <Button
+        android:id="@+id/clearKnownSamples"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/addKnownSample"
+        android:onClick="onClearKnownSamples"
+        android:text="Clear Known Samples" />
+
+    <view
+        android:id="@+id/knownSampleListView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/analyzeSample"
+        android:layout_toRightOf="@+id/analyzeSample"
+        class="ListView" />
+
+</RelativeLayout>

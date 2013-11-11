@@ -16,15 +16,23 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <activity
-            android:name="edu.tamu.csce470.mir.MainActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="landscape" >
+        <activity android:name="edu.tamu.csce470.mir.ClassifierActivity" android:label="@string/title_activity_classifier"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity><activity
+            android:name="edu.tamu.csce470.mir.MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity><activity android:name="edu.tamu.csce470.mir.CalibrationActivity" android:label="@string/title_activity_calibration">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="edu.tamu.csce470.mir.MainActivity" />
         </activity>
         <activity
             android:name="edu.tamu.csce470.mir.ImageDisplayActivity"
@@ -44,14 +52,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.tamu.csce470.mir.ImageDisplayActivity" />
         </activity>
-        <activity
-            android:name="edu.tamu.csce470.mir.CalibrationActivity"
-            android:label="@string/title_activity_calibration"
-            android:parentActivityName="edu.tamu.csce470.mir.MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="edu.tamu.csce470.mir.MainActivity" />
-        </activity>
+        
+        
     </application>
 
 </manifest>

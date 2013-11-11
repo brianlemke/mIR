@@ -8,5 +8,6 @@
     <string name="title_activity_image_display">ImageDisplayActivity</string>
     <string name="title_activity_spectrum_display">SpectrumDisplayActivity</string>
     <string name="title_activity_calibration">CalibrationActivity</string>
+    <string name="title_activity_classifier">ClassifierActivity</string>
 
 </resources>
