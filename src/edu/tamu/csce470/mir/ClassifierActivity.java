@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -52,10 +51,11 @@ public class ClassifierActivity extends Activity
 			if (resultCode == RESULT_OK)
 			{
 				returnedSpectrum = (SpectrumResult) data.getSerializableExtra("spectrumResult");
-				returnedSpectrum.standardizeValues();
 				
-				ArrayList<Double> errors = findErrorValues(returnedSpectrum, spectra);
-				populateKnownSpectraView(errors);
+				ArrayList<Double> standardizedErrors = findStandardizedErrorValues(returnedSpectrum, spectra);
+				ArrayList<Double> kScaledErrors = findKScaledErrorValues(returnedSpectrum, spectra);
+				
+				populateKnownSpectraView(standardizedErrors, kScaledErrors);
 			}
 		}
 		else if (requestCode == REQUEST_CODE_GET_NEW_SPECTRUM)
@@ -63,7 +63,7 @@ public class ClassifierActivity extends Activity
 			if (resultCode == RESULT_OK)
 			{
 				returnedSpectrum = (SpectrumResult) data.getSerializableExtra("spectrumResult");
-				returnedSpectrum.standardizeValues();
+				
 				setContentView(R.layout.activity_classifier_name_spectrum);
 			}
 		}
@@ -115,29 +115,35 @@ public class ClassifierActivity extends Activity
 	{
 		ListView view = (ListView) findViewById(R.id.knownSampleListView);
 		
-		ArrayList<String> spectraTitles = new ArrayList<String>();
+ClassifierResult[] results = new ClassifierResult[spectra.size()];
 		
 		for (int i = 0; i < spectra.size(); i++)
 		{
-			spectraTitles.add(spectra.get(i).name);
+			ClassifierResult result = new ClassifierResult(spectra.get(i).name);
+			result.kScaledMSE = -1;
+			result.standardizedMSE = -1;
+			results[i] = result;
 		}
 		
-		ArrayAdapter<String> spectraAdapter = new ArrayAdapter<String>(this, R.layout.known_spectrum_list_item, spectraTitles);
+		ClassifierListAdapter spectraAdapter = new ClassifierListAdapter(this, R.layout.view_classifier_list_item, results);
 		view.setAdapter(spectraAdapter);
 	}
 	
-	private void populateKnownSpectraView(ArrayList<Double> errorValues)
+	private void populateKnownSpectraView(ArrayList<Double> standardizedErrorValues, ArrayList<Double> kScaledErrorValues)
 	{
 		ListView view = (ListView) findViewById(R.id.knownSampleListView);
 		
-		ArrayList<String> spectraTitles = new ArrayList<String>();
+		ClassifierResult[] results = new ClassifierResult[spectra.size()];
 		
 		for (int i = 0; i < spectra.size(); i++)
 		{
-			spectraTitles.add(spectra.get(i).name + " (MSE: " + errorValues.get(i) + ")");
+			ClassifierResult result = new ClassifierResult(spectra.get(i).name);
+			result.kScaledMSE = kScaledErrorValues.get(i);
+			result.standardizedMSE = standardizedErrorValues.get(i);
+			results[i] = result;
 		}
 		
-		ArrayAdapter<String> spectraAdapter = new ArrayAdapter<String>(this, R.layout.known_spectrum_list_item, spectraTitles);
+		ClassifierListAdapter spectraAdapter = new ClassifierListAdapter(this, R.layout.view_classifier_list_item, results);
 		view.setAdapter(spectraAdapter);
 	}
 
@@ -181,13 +187,25 @@ public class ClassifierActivity extends Activity
 		populateKnownSpectraView();
 	}
 	
-	private ArrayList<Double> findErrorValues(SpectrumResult test, ArrayList<SpectrumResult> knownList)
+	private ArrayList<Double> findStandardizedErrorValues(SpectrumResult test, ArrayList<SpectrumResult> knownList)
 	{
 		ArrayList<Double> errorValues = new ArrayList<Double>(knownList.size());
 		
 		for (int i = 0; i < knownList.size(); i++)
 		{
-			errorValues.add(test.getMeanStandardError(knownList.get(i)));
+			errorValues.add(test.getStandardizedMeanStandardError(knownList.get(i)));
+		}
+		
+		return errorValues;
+	}
+	
+	private ArrayList<Double> findKScaledErrorValues(SpectrumResult test, ArrayList<SpectrumResult> knownList)
+	{
+		ArrayList<Double> errorValues = new ArrayList<Double>(knownList.size());
+		
+		for (int i = 0; i < knownList.size(); i++)
+		{
+			errorValues.add(test.getKScaledMeanStandardError(knownList.get(i)));
 		}
 		
 		return errorValues;

@@ -5,12 +5,15 @@ import java.util.ArrayList;
 
 public class SpectrumResult implements Serializable
 {
-	private static final long serialVersionUID = -7520960371400627733L;
+	private static final long serialVersionUID = -5663135656848490908L;
 	
 	public ArrayList<Double> absorbancies;
 	public double startWavelength;
 	public double endWavelength;
 	public String name;
+	
+	public double mean;
+	public double standardDeviation;
 
 	public SpectrumResult(Spectrum spectrum, CalibrationSettings settings)
 	{
@@ -40,6 +43,8 @@ public class SpectrumResult implements Serializable
 		{
 			absorbancies.add((double) fullAbsorbancies.get(i).intValue());
 		}
+		
+		calculateStatistics();
 	}
 	
 	public double getAbsorbanceAtWavelength(double wavelength)
@@ -67,9 +72,9 @@ public class SpectrumResult implements Serializable
 		return wavelength;
 	}
 	
-	public void standardizeValues()
+	private void calculateStatistics()
 	{
-		double mean = 0.0;
+		mean = 0.0;
 		for (int i = 0; i < absorbancies.size(); i++)
 		{
 			mean += absorbancies.get(i);
@@ -83,15 +88,10 @@ public class SpectrumResult implements Serializable
 		}
 		variance = variance / absorbancies.size();
 		
-		double standardDeviation = Math.sqrt(variance);
-		
-		for (int i = 0; i < absorbancies.size(); i++)
-		{
-			absorbancies.set(i, (absorbancies.get(i) - mean) / standardDeviation);
-		}
+		standardDeviation = Math.sqrt(variance);
 	}
 	
-	public double getMeanStandardError(SpectrumResult other)
+	public double getStandardizedMeanStandardError(SpectrumResult other)
 	{
 		double error = 0.0;
 		
@@ -105,7 +105,53 @@ public class SpectrumResult implements Serializable
 			
 			if (wavelength >= lowSharedWavelength && wavelength <= highSharedWavelength)
 			{
-				double diff = absorbancies.get(i) - other.getAbsorbanceAtWavelength(wavelength);
+				double scaled1 = (absorbancies.get(i) - mean) / standardDeviation;
+				double scaled2 = (other.getAbsorbanceAtWavelength(wavelength) - other.mean) / other.standardDeviation; 
+				double diff = scaled1 - scaled2;
+				error += Math.pow(diff, 2);
+				count++;
+			}
+		}
+		
+		return error / count;
+	}
+	
+	public double getKScaledMeanStandardError(SpectrumResult other)
+	{
+		double error = 0.0;
+		
+		double lowSharedWavelength = Math.max(startWavelength, other.startWavelength);
+		double highSharedWavelength = Math.min(endWavelength, other.endWavelength);
+		
+		// First calculate the scaling factor
+		double kNumerator = 0.0;
+		double kDenominator = 0.0;
+		for (int i = 0; i < absorbancies.size(); i++)
+		{
+			double wavelength = getWavelengthAtIndex(i);
+			
+			if (wavelength >= lowSharedWavelength && wavelength <= highSharedWavelength)
+			{
+				double mine = absorbancies.get(i);
+				double theirs = other.getAbsorbanceAtWavelength(wavelength);
+				
+				kNumerator += mine * theirs;
+				kDenominator += mine * mine;
+			}
+		}
+		double k = kNumerator / kDenominator;
+		
+		// Now calculate the actual MSE
+		int count = 0;
+		for (int i = 0; i < absorbancies.size(); i++)
+		{
+			double wavelength = getWavelengthAtIndex(i);
+			
+			if (wavelength >= lowSharedWavelength && wavelength <= highSharedWavelength)
+			{
+				double scaled1 = k * absorbancies.get(i);
+				double scaled2 = other.getAbsorbanceAtWavelength(wavelength);
+				double diff = scaled1 - scaled2;
 				error += Math.pow(diff, 2);
 				count++;
 			}
