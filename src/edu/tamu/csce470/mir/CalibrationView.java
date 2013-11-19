@@ -151,7 +151,7 @@ public class CalibrationView extends View
 		try
 		{
 			BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inSampleSize = 1;
+			options.inSampleSize = 2;
 			Bitmap fullImage = BitmapFactory.decodeFile(imageUri.getPath(), options);
 			imageBitmap = Bitmap.createScaledBitmap(fullImage, w, h, false);
 			fullImage.recycle();

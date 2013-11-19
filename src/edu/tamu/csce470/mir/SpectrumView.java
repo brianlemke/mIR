@@ -76,7 +76,7 @@ public class SpectrumView extends View
 			try
 			{
 				BitmapFactory.Options options = new BitmapFactory.Options();
-				options.inSampleSize = 1;
+				options.inSampleSize = 2;
 				baselineImage = BitmapFactory.decodeFile(spectrum.getBaselineUri().getPath(), options);
 			}
 			catch (Exception e)
@@ -94,7 +94,7 @@ public class SpectrumView extends View
 			try
 			{
 				BitmapFactory.Options options = new BitmapFactory.Options();
-				options.inSampleSize = 1;
+				options.inSampleSize = 2;
 				sampleImage = BitmapFactory.decodeFile(spectrum.getSampleUri().getPath(), options);
 			}
 			catch (Exception e)
