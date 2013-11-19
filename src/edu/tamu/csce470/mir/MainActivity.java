@@ -21,8 +21,8 @@ public class MainActivity extends Activity {
 
 	private static final int REQUEST_CODE_CAPTURE_BASELINE = 100;
 	private static final int REQUEST_CODE_CAPTURE_SAMPLE = 200;
-	private static final int REQUEST_CODE_SELECT_BASELINE = 300;
-	private static final int REQUEST_CODE_SELECT_SAMPLE = 400;
+	private static final int REQUEST_CODE_CUSTOM_BASELINE = 300;
+	private static final int REQUEST_CODE_CUSTOM_SAMPLE = 400;
 	private static final int REQUEST_CODE_CAPTURE_CALIBRATION = 500;
 	private static final int REQUEST_CODE_SET_CALIBRATION = 600;
 	
@@ -101,14 +101,12 @@ public class MainActivity extends Activity {
 				startActivity(displayImageIntent);
 			}
 		}
-		else if (requestCode == REQUEST_CODE_SELECT_BASELINE)
+		else if (requestCode == REQUEST_CODE_CUSTOM_BASELINE)
 		{
 			if (resultCode == RESULT_OK)
 			{
-				assert(data != null);
-				Uri selectedImageUri = data.getData();
-				Log.d("MainActivity", "Baseline image successfully selected from " + selectedImageUri);
-				spectrum.assignBaselineSpectrum(selectedImageUri);
+				Log.d("MainActivity", "Baseline image successfully captured custom from " + capturedImageUri.toString());
+				spectrum.assignBaselineSpectrum(capturedImageUri);
 				spectrum.setDisplayMode(DisplayMode.BASELINE_IMAGE);
 				
 				Intent displayImageIntent = new Intent(this, SpectrumDisplayActivity.class);
@@ -117,14 +115,12 @@ public class MainActivity extends Activity {
 				startActivity(displayImageIntent);
 			}
 		}
-		else if (requestCode == REQUEST_CODE_SELECT_SAMPLE)
+		else if (requestCode == REQUEST_CODE_CUSTOM_SAMPLE)
 		{
 			if (resultCode == RESULT_OK)
 			{
-				assert(data != null);
-				Uri selectedImageUri = data.getData();
-				Log.d("MainActivity", "Sample image successfully selected from " + selectedImageUri);
-				spectrum.assignSampleSpectrum(selectedImageUri);
+				Log.d("MainActivity", "Sample image successfully captured custom from " + capturedImageUri.toString());
+				spectrum.assignSampleSpectrum(capturedImageUri);
 				spectrum.setDisplayMode(DisplayMode.SAMPLE_IMAGE);
 				
 				Intent displayImageIntent = new Intent(this, SpectrumDisplayActivity.class);
@@ -175,8 +171,8 @@ public class MainActivity extends Activity {
 		{
 			findViewById(R.id.captureBaselineButton).setEnabled(false);
 			findViewById(R.id.captureSampleButton).setEnabled(false);
-			findViewById(R.id.selectBaselineButton).setEnabled(false);
-			findViewById(R.id.selectSampleButton).setEnabled(false);
+			findViewById(R.id.customCaptureBaselineButton).setEnabled(false);
+			findViewById(R.id.customCaptureSampleButton).setEnabled(false);
 			findViewById(R.id.displayBaselineButton).setEnabled(false);
 			findViewById(R.id.displaySampleButton).setEnabled(false);
 			findViewById(R.id.displaySpectrumButton).setEnabled(false);
@@ -185,8 +181,8 @@ public class MainActivity extends Activity {
 		{
 			findViewById(R.id.captureBaselineButton).setEnabled(true);
 			findViewById(R.id.captureSampleButton).setEnabled(true);
-			findViewById(R.id.selectBaselineButton).setEnabled(true);
-			findViewById(R.id.selectSampleButton).setEnabled(true);
+			findViewById(R.id.customCaptureBaselineButton).setEnabled(true);
+			findViewById(R.id.customCaptureSampleButton).setEnabled(true);
 			findViewById(R.id.displayBaselineButton).setEnabled(true);
 			findViewById(R.id.displaySampleButton).setEnabled(true);
 			findViewById(R.id.displaySpectrumButton).setEnabled(true);
@@ -203,12 +199,12 @@ public class MainActivity extends Activity {
 		captureImage(DisplayMode.SAMPLE_IMAGE);
 	}
 	
-	public void onLoadFileBaseline(View view) {
-		selectImage(DisplayMode.BASELINE_IMAGE);
+	public void onCustomCaptureBaseline(View view) {
+		customCaptureImage(DisplayMode.BASELINE_IMAGE);
 	}
 	
-	public void onLoadFileSample(View view) {
-		selectImage(DisplayMode.SAMPLE_IMAGE);
+	public void onCustomCaptureSample(View view) {
+		customCaptureImage(DisplayMode.SAMPLE_IMAGE);
 	}
 	
 	public void onDisplaySpectrum(View view) {
@@ -237,7 +233,7 @@ public class MainActivity extends Activity {
 	
 	public void onCalibrate(View view)
 	{
-		Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		Intent captureIntent = new Intent(this, ImageCaptureActivity.class);
 		getNewImageUri();
 		captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, capturedImageUri);
 		
@@ -311,19 +307,27 @@ public class MainActivity extends Activity {
 			capturedImageUri = Uri.fromFile(capturedImageFile);
 	}
 
-	private void selectImage(DisplayMode mode)
+	private void customCaptureImage(DisplayMode mode)
 	{
-		// We're going to offload image selection to the default chooser application
-		Intent selectIntent = new Intent(Intent.ACTION_GET_CONTENT);
-		selectIntent.setType("image/*");
+		Intent captureIntent = new Intent(this, ImageCaptureActivity.class);
+		
+		getNewImageUri();
+		
+		// Start the camera application to take our picture
+		captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, capturedImageUri);
+		
+		if (calibration != null)
+		{
+			captureIntent.putExtra("calibrationSettings", calibration);
+		}
 		
 		switch (mode)
 		{
 		case BASELINE_IMAGE:
-			startActivityForResult(selectIntent, REQUEST_CODE_SELECT_BASELINE);
+			startActivityForResult(captureIntent, REQUEST_CODE_CUSTOM_BASELINE);
 			break;
 		case SAMPLE_IMAGE:
-			startActivityForResult(selectIntent, REQUEST_CODE_SELECT_SAMPLE);
+			startActivityForResult(captureIntent, REQUEST_CODE_CUSTOM_SAMPLE);
 			break;
 		default:
 			assert(false);

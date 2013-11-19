@@ -14,6 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/customCaptureBaselineButton"
         android:onClick="onCaptureBaseline"
         android:text="Capture Baseline Image" />
 
@@ -22,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/captureBaselineButton"
-        android:layout_alignRight="@+id/captureBaselineButton"
+        android:layout_alignRight="@+id/customCaptureBaselineButton"
         android:layout_below="@+id/captureBaselineButton"
         android:onClick="onCaptureSample"
         android:text="Capture Sample Image" />
@@ -58,23 +59,22 @@
         android:text="Display Spectrum Graphs" />
 
     <Button
-        android:id="@+id/selectBaselineButton"
+        android:id="@+id/customCaptureBaselineButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/captureSampleButton"
         android:layout_alignTop="@+id/displaySpectrumButton"
-        android:onClick="onLoadFileBaseline"
-        android:text="Load Baseline from File" />
+        android:onClick="onCustomCaptureBaseline"
+        android:text="Custom Capture Baseline" />
 
     <Button
-        android:id="@+id/selectSampleButton"
+        android:id="@+id/customCaptureSampleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/selectBaselineButton"
-        android:layout_alignRight="@+id/selectBaselineButton"
-        android:layout_below="@+id/selectBaselineButton"
-        android:onClick="onLoadFileSample"
-        android:text="Load Sample from File" />
+        android:layout_alignLeft="@+id/customCaptureBaselineButton"
+        android:layout_alignRight="@+id/customCaptureBaselineButton"
+        android:layout_below="@+id/customCaptureBaselineButton"
+        android:onClick="onCustomCaptureSample"
+        android:text="Custom Capture Sample" />
 
     <Button
         android:id="@+id/calibrateButton"
@@ -82,7 +82,7 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/captureSampleButton"
         android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/selectSampleButton"
+        android:layout_alignRight="@+id/customCaptureSampleButton"
         android:onClick="onCalibrate"
         android:text="Calibrate" />
 
