@@ -102,7 +102,7 @@ public class ImageCaptureActivity extends Activity
 		{
 			Camera.Parameters params = this.camera.getParameters();
 			params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-			Camera.Size size = params.getSupportedPictureSizes().get(0);
+			Camera.Size size = params.getSupportedPictureSizes().get(2);
 			params.setPictureSize(size.width, size.height);
 			this.camera.setParameters(params);
 		}
