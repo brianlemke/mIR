@@ -23,7 +23,6 @@ public class SpectrumView extends View
 	Bitmap baselineImage;
 	Bitmap sampleImage;
 	
-	Paint borderPaint;
 	Paint baselinePaint;
 	Paint samplePaint;
 	Paint absorbancePaint;
@@ -39,10 +38,6 @@ public class SpectrumView extends View
 		
 		baselineImage = null;
 		sampleImage = null;
-		
-		borderPaint = new Paint();
-		borderPaint.setColor(Color.BLACK);
-		borderPaint.setStyle(Style.STROKE);
 		
 		baselinePaint = new Paint();
 		baselinePaint.setColor(Color.rgb(0, 0, 200));
@@ -174,8 +169,6 @@ public class SpectrumView extends View
 	
 	private void drawSpectrumGraph(Canvas canvas)
 	{
-		canvas.drawRect(1, 1, canvas.getWidth(), canvas.getHeight(), borderPaint);
-
 		ArrayList<Integer> baselineIntensities = spectrum.getBaselineIntensities();
 		ArrayList<Integer> sampleIntensities = spectrum.getSampleIntensities();
 		ArrayList<Integer> absorbancies = spectrum.getAbsorbancies();	

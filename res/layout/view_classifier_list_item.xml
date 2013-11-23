@@ -7,26 +7,58 @@
         android:id="@+id/resultName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@+id/resultOverallRank"
         android:text="Large Text"
         android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/resultOverallRank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:gravity="center_vertical"
+        android:text="-1"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="24pt" />
+
+    <TextView
+        android:id="@+id/resultStandardizedRank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/resultName"
+        android:layout_below="@+id/resultName"
+        android:text="-1"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/resultKScaledRank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/resultStandardizedRank"
+        android:layout_below="@+id/resultStandardizedRank"
+        android:text="-1"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
         android:id="@+id/resultKScaledMSE"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/resultName"
+        android:layout_alignBaseline="@+id/resultKScaledRank"
+        android:layout_alignBottom="@+id/resultKScaledRank"
+        android:layout_toRightOf="@+id/resultKScaledRank"
         android:text="Small Text"
+        android:layout_marginLeft="10dp"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
         android:id="@+id/resultStandardizedMSE"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/resultKScaledMSE"
+        android:layout_above="@+id/resultKScaledMSE"
+        android:layout_alignLeft="@+id/resultKScaledMSE"
         android:text="Small Text"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 

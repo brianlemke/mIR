@@ -7,11 +7,15 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -52,10 +56,9 @@ public class ClassifierActivity extends Activity
 			{
 				returnedSpectrum = (SpectrumResult) data.getSerializableExtra("spectrumResult");
 				
-				ArrayList<Double> standardizedErrors = findStandardizedErrorValues(returnedSpectrum, spectra);
-				ArrayList<Double> kScaledErrors = findKScaledErrorValues(returnedSpectrum, spectra);
+				ArrayList<ClassifierResult> comparisonResults = findRankedClassification(returnedSpectrum, spectra);
 				
-				populateKnownSpectraView(standardizedErrors, kScaledErrors);
+				populateKnownSpectraView(comparisonResults);
 			}
 		}
 		else if (requestCode == REQUEST_CODE_GET_NEW_SPECTRUM)
@@ -111,11 +114,51 @@ public class ClassifierActivity extends Activity
 		return loadedSpectra;
 	}
 	
+	private void addListListener(ListView listView)
+	{
+		listView.setOnItemClickListener(new OnItemClickListener() {
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+			{
+				ClassifierResult result = (ClassifierResult) parent.getAdapter().getItem(position);
+				int savedIndex = 0;
+				for (int i = 0; i < spectra.size(); i++)
+				{
+					if (result.name == spectra.get(i).name)
+					{
+						savedIndex = i;
+					}
+				}
+				
+				final int removeIndex = savedIndex;
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(parent.getContext());
+				builder.setMessage("Delete this saved spectrum?");
+				builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						spectra.remove(removeIndex);
+						populateKnownSpectraView();
+						saveSpectra(spectra);
+					}
+				});
+				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {	
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// Do nothing
+					}
+				});
+				
+				builder.create().show();
+			}
+		});
+	}
+	
 	private void populateKnownSpectraView()
 	{
 		ListView view = (ListView) findViewById(R.id.knownSampleListView);
+		addListListener(view);
 		
-ClassifierResult[] results = new ClassifierResult[spectra.size()];
+		ClassifierResult[] results = new ClassifierResult[spectra.size()];
 		
 		for (int i = 0; i < spectra.size(); i++)
 		{
@@ -129,21 +172,19 @@ ClassifierResult[] results = new ClassifierResult[spectra.size()];
 		view.setAdapter(spectraAdapter);
 	}
 	
-	private void populateKnownSpectraView(ArrayList<Double> standardizedErrorValues, ArrayList<Double> kScaledErrorValues)
+	private void populateKnownSpectraView(ArrayList<ClassifierResult> results)
 	{
 		ListView view = (ListView) findViewById(R.id.knownSampleListView);
+		addListListener(view);
 		
-		ClassifierResult[] results = new ClassifierResult[spectra.size()];
+		ClassifierResult[] resultsArray = new ClassifierResult[results.size()];
 		
-		for (int i = 0; i < spectra.size(); i++)
+		for (int i = 0; i < results.size(); i++)
 		{
-			ClassifierResult result = new ClassifierResult(spectra.get(i).name);
-			result.kScaledMSE = kScaledErrorValues.get(i);
-			result.standardizedMSE = standardizedErrorValues.get(i);
-			results[i] = result;
+			resultsArray[i] = results.get(i);
 		}
 		
-		ClassifierListAdapter spectraAdapter = new ClassifierListAdapter(this, R.layout.view_classifier_list_item, results);
+		ClassifierListAdapter spectraAdapter = new ClassifierListAdapter(this, R.layout.view_classifier_list_item, resultsArray);
 		view.setAdapter(spectraAdapter);
 	}
 
@@ -187,27 +228,61 @@ ClassifierResult[] results = new ClassifierResult[spectra.size()];
 		populateKnownSpectraView();
 	}
 	
-	private ArrayList<Double> findStandardizedErrorValues(SpectrumResult test, ArrayList<SpectrumResult> knownList)
+	private ArrayList<ClassifierResult> findRankedClassification(SpectrumResult test, ArrayList<SpectrumResult> knownList)
 	{
-		ArrayList<Double> errorValues = new ArrayList<Double>(knownList.size());
+		ArrayList<ClassifierResult> results = new ArrayList<ClassifierResult>();
 		
+		// First calculate the MSEs with each known sample
 		for (int i = 0; i < knownList.size(); i++)
 		{
-			errorValues.add(test.getStandardizedMeanStandardError(knownList.get(i)));
+			SpectrumResult known = knownList.get(i);
+			ClassifierResult result = new ClassifierResult(known.name);
+			result.kScaledMSE = test.getKScaledMeanStandardError(known);
+			result.standardizedMSE = test.getStandardizedMeanStandardError(known);
+			results.add(result);
 		}
 		
-		return errorValues;
-	}
-	
-	private ArrayList<Double> findKScaledErrorValues(SpectrumResult test, ArrayList<SpectrumResult> knownList)
-	{
-		ArrayList<Double> errorValues = new ArrayList<Double>(knownList.size());
-		
-		for (int i = 0; i < knownList.size(); i++)
+		// Now sort based on the standardized score
+		ArrayList<ClassifierResult> sortedResults = new ArrayList<ClassifierResult>();
+		while (results.size() > 0)
 		{
-			errorValues.add(test.getKScaledMeanStandardError(knownList.get(i)));
+			double bestScore = results.get(0).standardizedMSE;
+			int bestIndex = 0;
+			for (int i = 1; i < results.size(); i++)
+			{
+				double score = results.get(i).standardizedMSE;
+				if (score < bestScore)
+				{
+					bestScore = score;
+					bestIndex = i;
+				}
+			}
+			
+			ClassifierResult best = results.remove(bestIndex);
+			best.standardizedRank = sortedResults.size() + 1;
+			best.overallRank = best.standardizedRank;
+			sortedResults.add(best);
 		}
 		
-		return errorValues;
+		// Now calculate the k-scaled score for each sorted item
+		for (int i = 0; i < sortedResults.size(); i++)
+		{
+			double best = 0.0;
+			int bestIndex = -1;
+			for (int j = 0; j < sortedResults.size(); j++)
+			{
+				if (sortedResults.get(j).kScaledRank <= 0)
+				{
+					if (bestIndex == -1 || sortedResults.get(j).kScaledMSE < best)
+					{
+						best = sortedResults.get(j).kScaledMSE;
+						bestIndex = j;
+					}
+				}
+			}
+			sortedResults.get(bestIndex).kScaledRank = i + 1;
+		}
+		
+		return sortedResults;
 	}
 }
