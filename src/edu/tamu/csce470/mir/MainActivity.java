@@ -2,7 +2,9 @@ package edu.tamu.csce470.mir;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.UUID;
 
 import android.app.Activity;
@@ -19,8 +21,6 @@ import edu.tamu.csce470.mir.Spectrum.DisplayMode;
 
 public class MainActivity extends Activity {
 
-	private static final int REQUEST_CODE_CAPTURE_BASELINE = 100;
-	private static final int REQUEST_CODE_CAPTURE_SAMPLE = 200;
 	private static final int REQUEST_CODE_CUSTOM_BASELINE = 300;
 	private static final int REQUEST_CODE_CUSTOM_SAMPLE = 400;
 	private static final int REQUEST_CODE_CAPTURE_CALIBRATION = 500;
@@ -74,40 +74,16 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		Log.d("MainActivity", "onActivityResult called");
-		if (requestCode == REQUEST_CODE_CAPTURE_BASELINE) {
-			if (resultCode == RESULT_OK) {
-				// Launch image display view with the resulting picture
-				Log.d("MainActivity", "Image successfully captured from " + capturedImageUri.toString());
-				spectrum.assignBaselineSpectrum(capturedImageUri);
-				spectrum.setDisplayMode(DisplayMode.BASELINE_IMAGE);
-				
-				Intent displayImageIntent = new Intent(this, SpectrumDisplayActivity.class);
-				displayImageIntent.putExtra("spectrum", spectrum);
-				displayImageIntent.putExtra("calibrationSettings", calibration);
-				startActivity(displayImageIntent);
-			}
-		}
-		else if (requestCode == REQUEST_CODE_CAPTURE_SAMPLE)
-		{
-			if (resultCode == RESULT_OK)
-			{
-				Log.d("MainActivity", "Sample image successfully captured from " + capturedImageUri.toString());
-				spectrum.assignSampleSpectrum(capturedImageUri);
-				spectrum.setDisplayMode(DisplayMode.SAMPLE_IMAGE);
-				
-				Intent displayImageIntent = new Intent(this, SpectrumDisplayActivity.class);
-				displayImageIntent.putExtra("spectrum", spectrum);
-				displayImageIntent.putExtra("calibrationSettings", calibration);
-				startActivity(displayImageIntent);
-			}
-		}
-		else if (requestCode == REQUEST_CODE_CUSTOM_BASELINE)
+		if (requestCode == REQUEST_CODE_CUSTOM_BASELINE)
 		{
 			if (resultCode == RESULT_OK)
 			{
 				Log.d("MainActivity", "Baseline image successfully captured custom from " + capturedImageUri.toString());
 				spectrum.assignBaselineSpectrum(capturedImageUri);
 				spectrum.setDisplayMode(DisplayMode.BASELINE_IMAGE);
+				
+				calibration.baselineImagePath = capturedImageUri.getEncodedPath();
+				saveCalibrationSettings();
 				
 				Intent displayImageIntent = new Intent(this, SpectrumDisplayActivity.class);
 				displayImageIntent.putExtra("spectrum", spectrum);
@@ -169,8 +145,6 @@ public class MainActivity extends Activity {
 		
 		if (calibration == null)
 		{
-			findViewById(R.id.captureBaselineButton).setEnabled(false);
-			findViewById(R.id.captureSampleButton).setEnabled(false);
 			findViewById(R.id.customCaptureBaselineButton).setEnabled(false);
 			findViewById(R.id.customCaptureSampleButton).setEnabled(false);
 			findViewById(R.id.displayBaselineButton).setEnabled(false);
@@ -179,8 +153,6 @@ public class MainActivity extends Activity {
 		}
 		else
 		{
-			findViewById(R.id.captureBaselineButton).setEnabled(true);
-			findViewById(R.id.captureSampleButton).setEnabled(true);
 			findViewById(R.id.customCaptureBaselineButton).setEnabled(true);
 			findViewById(R.id.customCaptureSampleButton).setEnabled(true);
 			findViewById(R.id.displayBaselineButton).setEnabled(true);
@@ -188,15 +160,31 @@ public class MainActivity extends Activity {
 			findViewById(R.id.displaySpectrumButton).setEnabled(true);
 			
 			spectrum.setSampleRow(calibration.sampleRow);
+			
+			if (calibration.baselineImagePath != "")
+			{
+				spectrum.assignBaselineSpectrum(Uri.parse(calibration.baselineImagePath));
+			}
 		}
 	}
-
-	public void onCaptureBaseline(View view) {
-		captureImage(DisplayMode.BASELINE_IMAGE);
-	}
 	
-	public void onCaptureSample(View view) {
-		captureImage(DisplayMode.SAMPLE_IMAGE);
+	private void saveCalibrationSettings()
+	{
+		if (calibration != null)
+		{
+			try
+			{
+				FileOutputStream file = getApplicationContext().openFileOutput("calibration.bin", MODE_PRIVATE);
+				ObjectOutputStream objectStream = new ObjectOutputStream(file);
+				objectStream.writeObject(calibration);
+				objectStream.close();
+				file.close();
+			}
+			catch (Exception e)
+			{
+				Toast.makeText(this, "Failed to save baseline in calibration", Toast.LENGTH_LONG).show();
+			}
+		}
 	}
 	
 	public void onCustomCaptureBaseline(View view) {
@@ -253,29 +241,6 @@ public class MainActivity extends Activity {
 			intent.putExtra("spectrumResult", result);
 			setResult(RESULT_OK, intent);
 			finish();
-		}
-	}
-	
-	private void captureImage(DisplayMode mode)
-	{
-		// We're going to offload image capture to the default camera application
-		Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		
-		getNewImageUri();
-		
-		// Start the camera application to take our picture
-		captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, capturedImageUri);
-		
-		switch (mode)
-		{
-		case BASELINE_IMAGE:
-			startActivityForResult(captureIntent, REQUEST_CODE_CAPTURE_BASELINE);
-			break;
-		case SAMPLE_IMAGE:
-			startActivityForResult(captureIntent, REQUEST_CODE_CAPTURE_SAMPLE);
-			break;
-		default:
-			assert(false);
 		}
 	}
 	

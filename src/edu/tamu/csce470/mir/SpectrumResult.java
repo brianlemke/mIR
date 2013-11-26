@@ -105,8 +105,18 @@ public class SpectrumResult implements Serializable
 			
 			if (wavelength >= lowSharedWavelength && wavelength <= highSharedWavelength)
 			{
-				double scaled1 = (absorbancies.get(i) - mean) / standardDeviation;
-				double scaled2 = (other.getAbsorbanceAtWavelength(wavelength) - other.mean) / other.standardDeviation; 
+				double scaled1 = 0.0;
+				if (standardDeviation != 0.0)
+				{
+					scaled1 = (absorbancies.get(i) - mean) / standardDeviation;
+				}
+				
+				double scaled2 = 0.0;
+				if (other.standardDeviation != 0.0)
+				{
+					scaled2 = (other.getAbsorbanceAtWavelength(wavelength) - other.mean) / other.standardDeviation; 
+				}
+				
 				double diff = scaled1 - scaled2;
 				error += Math.pow(diff, 2);
 				count++;
@@ -139,7 +149,13 @@ public class SpectrumResult implements Serializable
 				kDenominator += mine * mine;
 			}
 		}
-		double k = kNumerator / kDenominator;
+		
+		double k = 0.0;
+		if (kDenominator != 0.0)
+		{
+			k = kNumerator / kDenominator;
+		}
+		
 		
 		// Now calculate the actual MSE
 		int count = 0;

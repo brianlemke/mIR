@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
 
 public class ImageCaptureActivity extends Activity
@@ -101,7 +102,7 @@ public class ImageCaptureActivity extends Activity
 		if (this.camera != null)
 		{
 			Camera.Parameters params = this.camera.getParameters();
-			params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+			params.setFlashMode(Camera.Parameters.FLASH_MODE_ON);
 			Camera.Size size = params.getSupportedPictureSizes().get(2);
 			params.setPictureSize(size.width, size.height);
 			this.camera.setParameters(params);
@@ -132,5 +133,7 @@ public class ImageCaptureActivity extends Activity
 	public void onTakePicture(View view)
 	{
 		this.camera.takePicture(null, null, this.picture);
+		Button captureButton = (Button) findViewById(R.id.takePicture);
+		captureButton.setEnabled(false);
 	}
 }

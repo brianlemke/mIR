@@ -9,26 +9,6 @@
     tools:context=".MainActivity" >
 
     <Button
-        android:id="@+id/captureBaselineButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignRight="@+id/customCaptureBaselineButton"
-        android:onClick="onCaptureBaseline"
-        android:text="Capture Baseline Image" />
-
-    <Button
-        android:id="@+id/captureSampleButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/captureBaselineButton"
-        android:layout_alignRight="@+id/customCaptureBaselineButton"
-        android:layout_below="@+id/captureBaselineButton"
-        android:onClick="onCaptureSample"
-        android:text="Capture Sample Image" />
-
-    <Button
         android:id="@+id/displaySampleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,8 +22,6 @@
         android:id="@+id/displayBaselineButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/captureBaselineButton"
-        android:layout_alignBottom="@+id/captureBaselineButton"
         android:layout_alignParentRight="true"
         android:onClick="onDisplaySpectrum"
         android:text="Display Baseline Image" />
@@ -59,10 +37,21 @@
         android:text="Display Spectrum Graphs" />
 
     <Button
+        android:id="@+id/acceptButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/displaySpectrumButton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:onClick="onAccept"
+        android:text="Accept Spectrum" />
+
+    <Button
         android:id="@+id/customCaptureBaselineButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/displaySpectrumButton"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:onClick="onCustomCaptureBaseline"
         android:text="Custom Capture Baseline" />
 
@@ -70,7 +59,7 @@
         android:id="@+id/customCaptureSampleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/customCaptureBaselineButton"
+        android:layout_alignParentLeft="true"
         android:layout_alignRight="@+id/customCaptureBaselineButton"
         android:layout_below="@+id/customCaptureBaselineButton"
         android:onClick="onCustomCaptureSample"
@@ -80,20 +69,11 @@
         android:id="@+id/calibrateButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/captureSampleButton"
-        android:layout_alignParentBottom="true"
+        android:layout_alignBaseline="@+id/acceptButton"
+        android:layout_alignBottom="@+id/acceptButton"
+        android:layout_alignLeft="@+id/customCaptureSampleButton"
         android:layout_alignRight="@+id/customCaptureSampleButton"
         android:onClick="onCalibrate"
         android:text="Calibrate" />
-
-    <Button
-        android:id="@+id/acceptButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/displaySpectrumButton"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:onClick="onAccept"
-        android:text="Accept Spectrum" />
 
 </RelativeLayout>

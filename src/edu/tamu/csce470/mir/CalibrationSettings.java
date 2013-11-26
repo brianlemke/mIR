@@ -21,6 +21,9 @@ public class CalibrationSettings implements Serializable
 	public double wavelength1;
 	public double wavelength2;
 	
+	// Optional persisted baseline image
+	public String baselineImagePath;
+	
 	public CalibrationSettings()
 	{
 		imageWidth = -1;
@@ -34,6 +37,8 @@ public class CalibrationSettings implements Serializable
 		pixel2 = -1;
 		wavelength1 = 0.0;
 		wavelength2 = 0.0;
+		
+		baselineImagePath = "";
 	}
 	
 	public boolean validateSettings()
